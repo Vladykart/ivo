@@ -11,6 +11,7 @@ GOOGLE_ANALYTICS_CREDENTIALS = {
     "key_file_location": ROOT_DIR.joinpath(
         "spirit-api-339912-3c7dbfa1dc4b.json"
     ),
+    "credentials": os.getenv("credentials"),
     "view_id": os.environ.get("VIEW_ID"),
 }
 

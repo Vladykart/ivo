@@ -6,7 +6,7 @@ import pandas as pd
 from settings import GOOGLE_ANALYTICS_CREDENTIALS as GA_CREDENTIALS
 
 SCOPES = ["https://www.googleapis.com/auth/analytics.readonly"]
-KEY_FILE_LOCATION = GA_CREDENTIALS["key_file_location"]
+KEY_FILE_LOCATION = GA_CREDENTIALS["credentials"]
 VIEW_ID = GA_CREDENTIALS["view_id"]
 
 # %%
