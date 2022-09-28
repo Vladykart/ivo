@@ -69,11 +69,6 @@ def to_excel(df) -> bytes:
 @authentication
 def app():
 
-
-
-
-
-
     default_columns = ['dateHourMinute',
                        'date', 'time',
                        'country', 'retail',
@@ -107,6 +102,7 @@ def app():
         file_name="output{}-{}.xlsx".format(date_from_input, date_to_input),
         mime="application/vnd.ms-excel",
     )
+
 
 if st.session_state.get("key_file") is None:
     st.write("Please upload key file")

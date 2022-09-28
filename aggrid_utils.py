@@ -49,8 +49,6 @@ def get_table(df, grid_options):
         data_return_mode=DataReturnMode.FILTERED_AND_SORTED,
         export_mode='serverSide',
         suppressExcelExport=True,
-        suppressCsvExport=True,
-        update_mode=GridUpdateMode.MODEL_CHANGED,
-        editable=True,
+
     )
     return agrid_table
