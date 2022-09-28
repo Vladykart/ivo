@@ -58,14 +58,14 @@ def get_report(analytics, request):
 
 
 # %%
-def initialize_analyticsreporting():
+def initialize_analyticsreporting(KEY_FILE):
     """Initializes an Analytics Reporting API V4 service object.
 
     Returns:
       An authorized Analytics Reporting API V4 service object.
     """
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        KEY_FILE_LOCATION, SCOPES
+        KEY_FILE, SCOPES
     )
 
     # Build the service object.
@@ -130,9 +130,9 @@ def compare_reports(reports):
 
 
 @cache
-def get_analysis_report(date_from, date_to):
+def get_analysis_report(date_from, date_to, KEY_FILE):
     request = compare_request(date_from, date_to)
-    analytics = initialize_analyticsreporting()
+    analytics = initialize_analyticsreporting(KEY_FILE)
     response = get_report(analytics, request)
     data = compare_reports(response.get('reports', []))
     df = pd.DataFrame(data)

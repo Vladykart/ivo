@@ -10,6 +10,11 @@ st._config.set_option('theme.base', 'dark')
 def app():
     st.markdown("# Home")
     st.sidebar.markdown("# Home")
+    # upload googleanalytics key file
+    key_file = st.file_uploader("Upload Google Analytics Key File", type="json")
+    # key file to session state
+    if key_file is not None:
+        st.session_state.key_file = key_file
 
 
 app()

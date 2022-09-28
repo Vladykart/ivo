@@ -67,6 +67,13 @@ def to_excel(df) -> bytes:
 
 @authentication
 def app():
+
+    if st.session_state.get("key_file") is None:
+        st.write("Please upload key file")
+        key_file = st.file_uploader("Upload key file", type="json", key="key_file")
+    else:
+        key_file = st.session_state.key_file
+
     default_columns = ['dateHourMinute',
                        'date', 'time',
                        'country', 'retail',
