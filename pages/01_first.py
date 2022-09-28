@@ -76,6 +76,8 @@ def app():
         key_file = st.session_state.key_file
 
     key_file = json.load(key_file)
+    if not key_file:
+        st.error("Please upload key file")
 
     default_columns = ['dateHourMinute',
                        'date', 'time',
