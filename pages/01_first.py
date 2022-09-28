@@ -81,40 +81,40 @@ def app():
 
     if not key_file:
         st.info("Please upload key file")
-    else:
-        default_columns = ['dateHourMinute',
-                           'date', 'time',
-                           'country', 'retail',
-                           'language', 'pageTitle',
-                           'uniqueEvents', 'eventValue',
-                           'totalEvents', 'goalCompletionsAll']
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 
-        agg_by = {'uniqueEvents': 'sum',
-                  'eventValue': 'sum',
-                  'totalEvents': 'sum',
-                  'goalCompletionsAll': 'sum'}
+    default_columns = ['dateHourMinute',
+                       'date', 'time',
+                       'country', 'retail',
+                       'language', 'pageTitle',
+                       'uniqueEvents', 'eventValue',
+                       'totalEvents', 'goalCompletionsAll']
 
-        st.markdown("# get analytics report")
-        st.sidebar.markdown("# get analytics report")
-        date_from_input, date_to_input, freq = generate_date_range_form()
-        st.write(date_from_input, date_to_input)
-        df = get_analysis_report(date_from_input, date_to_input, key_file)
+    agg_by = {'uniqueEvents': 'sum',
+              'eventValue': 'sum',
+              'totalEvents': 'sum',
+              'goalCompletionsAll': 'sum'}
 
-        df = prepare_report_by(df, freq)
-        # df = group_by(df, group_by_form(df.columns), agg_by)
-        gb = set_ggrid_options(df)
-        grid_options = gb.build()
-        print(grid_options)
+    st.markdown("# get analytics report")
+    st.sidebar.markdown("# get analytics report")
+    date_from_input, date_to_input, freq = generate_date_range_form()
+    st.write(date_from_input, date_to_input)
+    df = get_analysis_report(date_from_input, date_to_input, key_file)
 
-        # Add aggrid table to display dataframe
-        grid_response = get_table(df, grid_options)
-        output_data = grid_response["data"]
+    df = prepare_report_by(df, freq)
+    # df = group_by(df, group_by_form(df.columns), agg_by)
+    gb = set_ggrid_options(df)
+    grid_options = gb.build()
 
-        st.download_button(
-            "Download as excel",
-            data=to_excel(output_data),
-            file_name="output{}-{}.xlsx".format(date_from_input, date_to_input),
-            mime="application/vnd.ms-excel",
-        )
+    # Add aggrid table to display dataframe
+    grid_response = get_table(df, grid_options)
+    output_data = grid_response["data"]
+
+    st.download_button(
+        "Download as excel",
+        data=to_excel(output_data),
+        file_name="output{}-{}.xlsx".format(date_from_input, date_to_input),
+        mime="application/vnd.ms-excel",
+    )
 
 app()
