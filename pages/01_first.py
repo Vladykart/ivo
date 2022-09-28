@@ -72,46 +72,49 @@ def app():
     if st.session_state.get("key_file") is None:
         st.write("Please upload key file")
         key_file = st.file_uploader("Upload key file", type="json", key="key_file")
+        if key_file is not None:
+            key_file = json.load(key_file)
     else:
         key_file = st.session_state.key_file
+        key_file = json.load(key_file)
 
-    key_file = json.load(key_file)
+
     if not key_file:
-        st.error("Please upload key file")
+        st.info("Please upload key file")
+    else:
+        default_columns = ['dateHourMinute',
+                           'date', 'time',
+                           'country', 'retail',
+                           'language', 'pageTitle',
+                           'uniqueEvents', 'eventValue',
+                           'totalEvents', 'goalCompletionsAll']
 
-    default_columns = ['dateHourMinute',
-                       'date', 'time',
-                       'country', 'retail',
-                       'language', 'pageTitle',
-                       'uniqueEvents', 'eventValue',
-                       'totalEvents', 'goalCompletionsAll']
+        agg_by = {'uniqueEvents': 'sum',
+                  'eventValue': 'sum',
+                  'totalEvents': 'sum',
+                  'goalCompletionsAll': 'sum'}
 
-    agg_by = {'uniqueEvents': 'sum',
-              'eventValue': 'sum',
-              'totalEvents': 'sum',
-              'goalCompletionsAll': 'sum'}
+        st.markdown("# get analytics report")
+        st.sidebar.markdown("# get analytics report")
+        date_from_input, date_to_input, freq = generate_date_range_form()
+        st.write(date_from_input, date_to_input)
+        df = get_analysis_report(date_from_input, date_to_input, key_file)
 
-    st.markdown("# get analytics report")
-    st.sidebar.markdown("# get analytics report")
-    date_from_input, date_to_input, freq = generate_date_range_form()
-    st.write(date_from_input, date_to_input)
-    df = get_analysis_report(date_from_input, date_to_input, key_file)
+        df = prepare_report_by(df, freq)
+        # df = group_by(df, group_by_form(df.columns), agg_by)
+        gb = set_ggrid_options(df)
+        grid_options = gb.build()
+        print(grid_options)
 
-    df = prepare_report_by(df, freq)
-    # df = group_by(df, group_by_form(df.columns), agg_by)
-    gb = set_ggrid_options(df)
-    grid_options = gb.build()
-    print(grid_options)
+        # Add aggrid table to display dataframe
+        grid_response = get_table(df, grid_options)
+        output_data = grid_response["data"]
 
-    # Add aggrid table to display dataframe
-    grid_response = get_table(df, grid_options)
-    output_data = grid_response["data"]
-
-    st.download_button(
-        "Download as excel",
-        data=to_excel(output_data),
-        file_name="output{}-{}.xlsx".format(date_from_input, date_to_input),
-        mime="application/vnd.ms-excel",
-    )
+        st.download_button(
+            "Download as excel",
+            data=to_excel(output_data),
+            file_name="output{}-{}.xlsx".format(date_from_input, date_to_input),
+            mime="application/vnd.ms-excel",
+        )
 
 app()
