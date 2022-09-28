@@ -69,19 +69,10 @@ def to_excel(df) -> bytes:
 @authentication
 def app():
 
-    if st.session_state.get("key_file") is None:
-        st.write("Please upload key file")
-        key_file = st.file_uploader("Upload key file", type="json", key="key_file")
-        if key_file is not None:
-            key_file = json.load(key_file)
-    else:
-        key_file = st.session_state.key_file
-        key_file = json.load(key_file)
 
 
-    if not key_file:
-        st.info("Please upload key file")
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
+
 
     default_columns = ['dateHourMinute',
                        'date', 'time',
@@ -117,4 +108,16 @@ def app():
         mime="application/vnd.ms-excel",
     )
 
-app()
+if st.session_state.get("key_file") is None:
+    st.write("Please upload key file")
+    key_file = st.file_uploader("Upload key file", type="json", key="key_file")
+    if key_file:
+        st.session_state.key_file = key_file
+    if key_file is not None:
+        key_file = json.load(key_file)
+        app()
+else:
+    key_file = st.session_state.key_file
+    key_file = json.load(key_file)
+    app()
+
