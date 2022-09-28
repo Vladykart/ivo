@@ -7,6 +7,7 @@ from ga_get_data import get_analysis_report
 from prepare_data import prepare_report_by, group_by
 import pandas as pd
 import io
+import json
 
 st.set_page_config(page_title="report", layout="wide")
 st._config.set_option('theme.base', 'dark')
@@ -74,6 +75,8 @@ def app():
     else:
         key_file = st.session_state.key_file
 
+    key_file = json.load(key_file)
+
     default_columns = ['dateHourMinute',
                        'date', 'time',
                        'country', 'retail',
@@ -90,7 +93,7 @@ def app():
     st.sidebar.markdown("# get analytics report")
     date_from_input, date_to_input, freq = generate_date_range_form()
     st.write(date_from_input, date_to_input)
-    df = get_analysis_report(date_from_input, date_to_input)
+    df = get_analysis_report(date_from_input, date_to_input, key_file)
 
     df = prepare_report_by(df, freq)
     # df = group_by(df, group_by_form(df.columns), agg_by)

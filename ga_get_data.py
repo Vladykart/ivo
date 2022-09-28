@@ -64,9 +64,12 @@ def initialize_analyticsreporting(KEY_FILE):
     Returns:
       An authorized Analytics Reporting API V4 service object.
     """
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+
+
+    credentials = ServiceAccountCredentials.from_json_keyfile_dict(
         KEY_FILE, SCOPES
     )
+
 
     # Build the service object.
     analytics = build("analyticsreporting", "v4", credentials=credentials)
