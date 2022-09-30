@@ -64,8 +64,6 @@ def initialize_analyticsreporting(KEY_FILE):
     Returns:
       An authorized Analytics Reporting API V4 service object.
     """
-
-
     credentials = ServiceAccountCredentials.from_json_keyfile_dict(
         KEY_FILE, SCOPES
     )

@@ -1,10 +1,13 @@
 import datetime
+from pprint import pprint
+
 import streamlit as st
 
 from aggrid_utils import set_ggrid_options, get_table
 from st_auth import authentication
 from ga_get_data import get_analysis_report
 from prepare_data import prepare_report_by, group_by
+from settings import google_key
 import pandas as pd
 import io
 import json
@@ -14,6 +17,8 @@ st._config.set_option('theme.base', 'dark')
 
 
 def generate_date_range_form():
+
+    st.session_state['key_file'] = google_key
     with st.form(key="date_range_form"):
         col1, col2, col3 = st.columns([2, 2, 1])
         today = datetime.date.today()
@@ -85,16 +90,20 @@ def app():
     st.sidebar.markdown("# get analytics report")
     date_from_input, date_to_input, freq = generate_date_range_form()
     st.write(date_from_input, date_to_input)
-    df = get_analysis_report(date_from_input, date_to_input, key_file)
+    df = get_analysis_report(date_from_input, date_to_input, google_key)
 
     df = prepare_report_by(df, freq)
     # df = group_by(df, group_by_form(df.columns), agg_by)
     gb = set_ggrid_options(df)
+    print(gb.__dict__)
     grid_options = gb.build()
 
     # Add aggrid table to display dataframe
     grid_response = get_table(df, grid_options)
+
+
     output_data = grid_response["data"]
+
 
     st.download_button(
         "Download as excel",
@@ -104,16 +113,5 @@ def app():
     )
 
 
-if st.session_state.get("key_file") is None:
-    st.write("Please upload key file")
-    key_file = st.file_uploader("Upload key file", type="json", key="key_file")
-    if key_file:
-        st.session_state.key_file = key_file
-    if key_file is not None:
-        key_file = json.load(key_file)
-        app()
-else:
-    key_file = st.session_state.key_file
-    key_file = json.load(key_file)
-    app()
+app()
 
