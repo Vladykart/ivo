@@ -74,6 +74,7 @@ def to_excel(df) -> bytes:
 
 @authentication
 def app():
+    from settings import google_key
     st.session_state['key_file'] = google_key
     default_columns = ['dateHourMinute',
                        'date', 'time',
@@ -91,7 +92,7 @@ def app():
     st.sidebar.markdown("# get analytics report")
     date_from_input, date_to_input, freq = generate_date_range_form()
     st.write(date_from_input, date_to_input)
-    df = get_analysis_report(date_from_input, date_to_input, google_key)
+    df = get_analysis_report(date_from_input, date_to_input, st.session_state['key_file'])
 
     df = prepare_report_by(df, freq)
     # df = group_by(df, group_by_form(df.columns), agg_by)
