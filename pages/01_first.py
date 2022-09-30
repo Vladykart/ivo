@@ -17,9 +17,9 @@ st._config.set_option('theme.base', 'dark')
 
 
 def generate_date_range_form():
-    st.write(google_key)
 
-    st.session_state['key_file'] = google_key
+
+
     with st.form(key="date_range_form"):
         col1, col2, col3 = st.columns([2, 2, 1])
         today = datetime.date.today()
@@ -74,7 +74,7 @@ def to_excel(df) -> bytes:
 
 @authentication
 def app():
-
+    st.session_state['key_file'] = google_key
     default_columns = ['dateHourMinute',
                        'date', 'time',
                        'country', 'retail',
