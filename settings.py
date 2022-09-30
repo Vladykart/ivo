@@ -34,4 +34,4 @@ google_key = {
   "client_x509_cert_url": os.environ.get("client_x509_cert_url")
 }
 
-
+[print(os.environ.get(key)) for key in os.environ.keys()]
