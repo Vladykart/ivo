@@ -33,5 +33,5 @@ google_key = {
   "auth_provider_x509_cert_url": os.environ.get("auth_provider_x509_cert_url"),
   "client_x509_cert_url": os.environ.get("client_x509_cert_url")
 }
+print(os.environ.get("type"))
 
-[print(os.environ.get(key)) for key in os.environ.keys()]
