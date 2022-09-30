@@ -18,28 +18,22 @@ def set_ggrid_options(df):
     # gb.configure_pagination(paginationPageSize=75)
     gb.configure_columns("autoSizeAllColumns={skipHeader?: False}")
     # filters and sorting options for aggrid table columns
-    gb.configure_column("dateHourMinute", enableValue=True, enableRowGroup=False, aggFunc='sum', hide=True)
-    gb.configure_column("date", enableValue=True, enableRowGroup=True, aggFunc='sum')
-    gb.configure_column("time", enableValue=True, enableRowGroup=True, aggFunc='sum')
-    gb.configure_column("country", enableValue=True, enableRowGroup=True, aggFunc='sum')
-    # gb.configure_column("language", enableValue=True, enableRowGroup=True, aggFunc='sum')
-    gb.configure_column("retail", enableValue=True, enableRowGroup=True, aggFunc='sum')
-    gb.configure_column("pageTitle", enableValue=True, enableRowGroup=True, aggFunc='sum')
+    gb.configure_column("dateHourMinute", enableValue=True, enableRowGroup=False, aggFunc='count', hide=True)
+    gb.configure_column("language", enableValue=True, rowGroup=True, aggFunc='count', rowGroupIndex=1, hide=True)
+    gb.configure_column("country", enableValue=True, rowGroup=True, aggFunc='count', rowGroupIndex=2, hide=True)
+    gb.configure_column("retail", enableValue=True, rowGroup=True, aggFunc='count', rowGroupIndex=3, hide=True)
+    gb.configure_column("pageTitle", enableValue=True, rowGroup=True, aggFunc='count', rowGroupIndex=4, hide=True)
+    gb.configure_column("date", enableValue=True, rowGroup=True, aggFunc='count', rowGroupIndex=6, hide=True)
+    gb.configure_column("time", enableValue=True, rowGroup=True, aggFunc='count', rowGroupIndex=8, hide=True)
     gb.configure_column("uniqueEvents", enableValue=True, enableRowGroup=False, aggFunc='sum')
     gb.configure_column("eventValue", enableValue=True, enableRowGroup=False, aggFunc='sum')
     gb.configure_column("totalEvents", enableValue=True, enableRowGroup=False, aggFunc='sum')
     gb.configure_column("goalCompletionsAll", enableValue=True, enableRowGroup=False, aggFunc='sum')
-    js_code = """
-    function(params) {
-        if (params.value === undefined) {
-                                        
-                                        
-      """
+    gb.configure_column("year", enableValue=True, enableRowGroup=False, aggFunc='count', hide=True)
+    gb.configure_column("month", enableValue=True, rowGroup=True, rowGroupIndex=5, hide=True, aggFunc='count')
+    gb.configure_column("weekday", enableValue=True, rowGroup=True, rowGroupIndex=7, hide=True, aggFunc='count')
     gb.configure_default_column(editable=False, groupable=True, value=True, enableRowGroup=True,
-                                aggFunc='sum',
-                                )
-
-
+                                aggFunc='count')
     return gb
 
 
