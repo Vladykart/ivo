@@ -223,6 +223,9 @@ def generate_date_range_form():
     return date_from_input, date_to_input, frequency
 
 
+#
+
+
 def generate_custom_group_form(data):
     """
     Generate custom group form based on data from Google Analytics
@@ -239,9 +242,11 @@ def generate_custom_group_form(data):
     default_groups = ["customVarValue1", "customVarValue2", "customVarValue3"]
     # callback for custom group form
 
-
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
+        custom_group_preset_name = st.text_input(
+            "Custom group preset name", value="custom_group_preset_1"
+        )
         st.session_state["custom_group_on_col"] = st.selectbox(
             "Custom grop on column",
             data.columns,
@@ -255,27 +260,44 @@ def generate_custom_group_form(data):
             key="custom_groups_name",
             help="choose custom groups name",
             on_change=None,
-
         )
     with col2:
         custom_groups = {}
         # string to list
-
-        for grop in st.session_state["custom_groups_name"].strip('[]').replace(" ", "").split(","):
+        values = data[st.session_state["custom_group_on_col"]].unique()
+        custom_group_names = (
+            st.session_state["custom_groups_name"]
+            .strip("[]")
+            .replace(" ", "")
+            .split(",")
+        )
+        for g in custom_group_names:
             group = st.multiselect(
-                grop,
-                data[st.session_state["custom_group_on_col"]].unique(),
+                g,
+                values,
                 default=[],
-                key=grop,
+                key=g,
                 help="choose values for custom group",
             )
-            custom_groups[grop] = group
+            values = [x for x in values if x not in group]
+            custom_groups[g] = group
+        custom_groups["other"] = values
+
     #
     with col3:
-        st.json(custom_groups)
+        st.session_state["groups_mappers"] = {
+            custom_group_preset_name: {
+                "on_column": st.session_state["custom_group_on_col"],
+                "custom_groups": custom_groups,
+            }
+        }
+        # get first key from dict
+
+        st.json(st.session_state["groups_mappers"])
     #     st.form_submit_button("Submit")
 
     return
+
 
 def group_by_form(*args):
     with st.form(key="group_by_form"):
@@ -338,7 +360,14 @@ def app():
     )
 
     df = prepare_report_by(df, freq)
+    # generate group by form
     generate_custom_group_form(df)
+    # df[list(st.session_state['groups_mappers'].keys())[0]] = df.apply(
+    #     lambda x: get_group(x, st.session_state['groups_mappers']), axis=1
+
+
+
+    st.dataframe(df)
 
     # df = group_by(df, group_by_form(df.columns), agg_by)
     gb = set_ggrid_options(df)
