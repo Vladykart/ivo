@@ -114,6 +114,16 @@ def set_ggrid_options(df):
     gb.configure_default_column(
         editable=False, groupable=True, value=True, enableRowGroup=True, aggFunc="count"
     )
+    for col in df.columns:
+        if str(col).startswith("custom_"):
+            gb.configure_column(
+                col,
+                enableValue=True,
+                rowGroup=True,
+                aggFunc="count",
+                rowGroupIndex=0,
+                hide=True,
+            )
     return gb
 
 

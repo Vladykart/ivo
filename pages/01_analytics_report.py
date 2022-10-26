@@ -238,65 +238,69 @@ def generate_custom_group_form(data):
             }
                 }
     """
-    st.subheader("Custom grouper")
     default_groups = ["customVarValue1", "customVarValue2", "customVarValue3"]
     # callback for custom group form
-
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col1:
-        custom_group_preset_name = st.text_input(
-            "Custom group preset name", value="custom_group_preset_1"
-        )
-        st.session_state["custom_group_on_col"] = st.selectbox(
-            "Custom grop on column",
-            data.columns,
-            index=3,
-            key="custom_grop_on_column",
-            help="choose custom grop on column",
-        )
-        st.session_state["Custom groups name"] = st.text_area(
-            "Custom groups name",
-            value=default_groups,
-            key="custom_groups_name",
-            help="choose custom groups name",
-            on_change=None,
-        )
-    with col2:
-        custom_groups = {}
-        # string to list
-        values = data[st.session_state["custom_group_on_col"]].unique()
-        custom_group_names = (
-            st.session_state["custom_groups_name"]
-            .strip("[]")
-            .replace(" ", "")
-            .split(",")
-        )
-        for g in custom_group_names:
-            group = st.multiselect(
-                g,
-                values,
-                default=[],
-                key=g,
-                help="choose values for custom group",
+    with st.expander("Custom grouper"):
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            custom_group_preset_name = st.text_input(
+                "Custom group preset name", value="custom_group_preset_1"
             )
-            values = [x for x in values if x not in group]
-            custom_groups[g] = group
-        custom_groups["other"] = values
+            st.session_state["custom_group_on_col"] = st.selectbox(
+                "Custom grop on column",
+                data.columns,
+                index=2,
+                key="custom_grop_on_column",
+                help="choose custom grop on column",
+            )
+            st.session_state["Custom groups name"] = st.text_area(
+                "Custom groups name",
+                value=default_groups,
+                key="custom_groups_name",
+                help="choose custom groups name",
+                on_change=None,
+            )
+        with col2:
+            custom_groups = {}
+            # string to list
+            values = data[st.session_state["custom_group_on_col"]].unique()
+            custom_group_names = (
+                st.session_state["custom_groups_name"]
+                .strip("[]")
+                .replace(" ", "")
+                .split(",")
+            )
+            for g in custom_group_names:
+                group = st.multiselect(
+                    g,
+                    values,
+                    default=[],
+                    key=g,
+                    help="choose values for custom group",
+                )
 
-    #
-    with col3:
-        st.session_state["groups_mappers"] = {
-            custom_group_preset_name: {
-                "on_column": st.session_state["custom_group_on_col"],
-                "custom_groups": custom_groups,
+
+                if [x for x in values if x not in group]:
+                    custom_groups[g] = [x for x in values if x not in group]
+
+                # values = [x for x in values if x not in group]
+
+                custom_groups[g] = group
+
+
+
+        #
+        with col3:
+            st.session_state["groups_mappers"] = {
+                custom_group_preset_name: {
+                    "on_column": st.session_state["custom_group_on_col"],
+                    "custom_groups": custom_groups,
+                }
             }
-        }
-        # get first key from dict
+            # get first key from dict
 
-        st.json(st.session_state["groups_mappers"])
-    #     st.form_submit_button("Submit")
-
-    return
+            # st.json(st.session_state["groups_mappers"])
+        return st.session_state["groups_mappers"]
 
 
 def group_by_form(*args):
@@ -361,21 +365,36 @@ def app():
 
     df = prepare_report_by(df, freq)
     # generate group by form
-    generate_custom_group_form(df)
+    group_form = generate_custom_group_form(df)
     # df[list(st.session_state['groups_mappers'].keys())[0]] = df.apply(
     #     lambda x: get_group(x, st.session_state['groups_mappers']), axis=1
 
+    # df[list(group_form.keys())] = df[list(group_form.get("on_column"))]
+
+    # st.dataframe(df[group_form.get(group_form.keys()[0]).get("on_column")])
+    # get first key from dict
+    custom_group_name = list(group_form.keys())[0]
+    # get on column from group form
+    on_column = group_form.get(custom_group_name).get("on_column")
+    # get custom groups from group form
+    custom_groups = group_form.get(custom_group_name).get("custom_groups")
+
+    def get_group(x, custom_groups, on_column):
+        for custom_group in custom_groups:
+            if x[on_column] in custom_groups.get(custom_group):
+                return custom_group
+        return "other"
 
 
-    st.dataframe(df)
+    df[custom_group_name] = df.apply(lambda x: get_group(x, custom_groups, on_column), axis=1)
 
-    # df = group_by(df, group_by_form(df.columns), agg_by)
     gb = set_ggrid_options(df)
     print(gb.__dict__)
     grid_options = gb.build()
 
     # Add aggrid table to display dataframe
     grid_response = get_table(df, grid_options)
+
 
     output_data = grid_response["data"]
 
