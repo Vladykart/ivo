@@ -2,6 +2,7 @@ import datetime
 from pprint import pprint
 
 import streamlit as st
+from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode, JsCode
 
 from aggrid_utils import set_ggrid_options, get_table
 from st_auth import authentication
@@ -263,7 +264,7 @@ def generate_custom_group_form(data):
         with col2:
             custom_groups = {}
             # string to list
-            values = data[st.session_state["custom_group_on_col"]].unique()
+
             custom_group_names = (
                 st.session_state["custom_groups_name"]
                 .strip("[]")
@@ -271,6 +272,7 @@ def generate_custom_group_form(data):
                 .split(",")
             )
             for g in custom_group_names:
+                values = data[st.session_state["custom_group_on_col"]].unique()
                 group = st.multiselect(
                     g,
                     values,
@@ -279,17 +281,12 @@ def generate_custom_group_form(data):
                     help="choose values for custom group",
                 )
 
-
                 if [x for x in values if x not in group]:
                     custom_groups[g] = [x for x in values if x not in group]
-
-                # values = [x for x in values if x not in group]
-
                 custom_groups[g] = group
 
 
 
-        #
         with col3:
             st.session_state["groups_mappers"] = {
                 custom_group_preset_name: {
@@ -396,6 +393,7 @@ def app():
     grid_response = get_table(df, grid_options)
 
 
+
     output_data = grid_response["data"]
 
     st.download_button(
@@ -404,6 +402,13 @@ def app():
         file_name="output{}-{}.xlsx".format(date_from_input, date_to_input),
         mime="application/vnd.ms-excel",
     )
+
+
+    df = grid_response
+    st.dataframe(df["data"])
+    st.write(grid_options)
+
+
 
 
 app()
