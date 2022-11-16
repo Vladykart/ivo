@@ -1,3 +1,65 @@
+from datetime import datetime
+import plotly.express as px
+import pandas as pd
+
+
+def prepare_date_columns(df):
+    df["date"] = pd.to_datetime(df["date"], format="%Y%m%d")
+    return df
+
+
+def group_data(df, by=None):
+    if by:
+        return df.groupby(by=by).sum()
+    else:
+        return df
+
+
+def aggregate_data(df, method=None):
+    df = df.agg(method)
+    return df
+
+
+def top_events(data, event, start_date, end_date):
+    agg = {"totalEvents": "sum", "uniqueEvents": "sum", "eventValue": "mean"}
+    if type(start_date) == str:
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    if type(end_date) == str:
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+    df = data.copy()
+    df["date"] = pd.to_datetime(df["date"])
+    df = (
+        df[df["eventAction"] == event]
+        .groupby(by=["name", "date"])
+        .agg(agg)
+        .reset_index()
+    )
+    df = df.sort_values(by=["eventValue"], ascending=False).reset_index(drop=True)
+    return df
+
+
+def prepare_video_events_data(df, product_name):
+    df = df[df["name"] == product_name]
+    groupby = ["eventAction"]
+    agg = {"totalEvents": "sum", "uniqueEvents": "sum", "eventValue": "mean"}
+    df = df.groupby(by=groupby).agg(agg).reset_index()
+    return df
+
+
+def create_aria_plot(df):
+    # draw aria plot with plotly
+    #
+    x_axis = df["eventValue"]
+    #
+    y_axis = df["totalEvents"]
+    #
+    colors = df["eventAction"]
+    #
+    df = px.data.gapminder()
+    fig = px.area(df, x=x_axis, y=y_axis, color="continent", line_group="eventAction")
+    return fig
+
+
 import pandas as pd
 from streamlit import cache
 from settings import LOCAL_DATA_PATH
@@ -31,11 +93,6 @@ def drop_columns(data):
     return data.drop(columns=["eventCategory", "eventAction"], axis=1)
 
 
-def prepare_column_names(data):
-    data.columns = data.columns.str.replace("ga:", "")
-    return data
-
-
 def rename_columns(data):
     return data.rename(
         columns={
@@ -46,14 +103,6 @@ def rename_columns(data):
             "totalEvents": "Total events",
             "goalCompletionsAll": "Goal completions all",
             "eventLabel": "Event label",
-            "pagePath": "Page path",
-            "date": "Date",
-            "time": "Time",
-            "weekday": "Weekday",
-            "month": "Month",
-            "year": "Year",
-            "language": "Language",
-            "retail": "Retail",
         }
     )
 
@@ -96,7 +145,6 @@ def set_time_frequency(data, freq="H"):
     freq = 'D' - daily
     freq = 'M' - monthly
     """
-    return data
     data = data.set_index(["dateHourMinute"])
     data = data.resample(freq).sum()
     data = data.reset_index()
@@ -117,7 +165,6 @@ def add_custom_category(data, new_category_column_name, column, **kwargs):
     return data
 
 
-
 def prepare_report_by(data, freq):
     """Prepare report by [args] and {kwargs}
     Example form: prepare_report_by(data, ['date', 'retail', 'language'], agg_by=agg_by
@@ -136,10 +183,3 @@ def prepare_report_by(data, freq):
     data = split_date_and_time(data)
     # data = rename_columns(data)
     return data
-
-
-# %%
-
-
-
-# %%

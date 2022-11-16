@@ -7,11 +7,17 @@ LOCAL_DATA_PATH = ROOT_DIR.joinpath("data")
 
 load_dotenv()
 
-GOOGLE_ANALYTICS_CREDENTIALS = {
-    "key_file_location": ROOT_DIR.joinpath("spirit-api-339912-3c7dbfa1dc4b.json"),
-    "credentials": os.getenv("credentials"),
-    "view_id": os.environ.get("VIEW_ID"),
+
+AGRID_OPTIONSS = {
+    "fit_columns_on_grid_load": True,
+    "allow_unsafe_jscode": True,
+    "enable_enterprise_modules": True,
+    "height": 500,
+    "rows": 40,
 }
+
+VIEW_ID = os.environ.get("VIEW_ID"),
+
 
 LOGIN_CREDENTIALS = {
     "names": os.environ["NAMES"],
@@ -19,7 +25,7 @@ LOGIN_CREDENTIALS = {
     "passwords": os.environ["PASSWORDS"],
 }
 
-google_key = {
+GOOGLE_KEY = {
     "type": os.environ.get("type"),
     "project_id": os.environ.get("project_id"),
     "private_key_id": os.environ.get("private_key_id"),
